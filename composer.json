@@ -1,0 +1,12 @@
+{
+    "name": "webtorque/shop-stock",
+    "type": "silverstripe-module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Carey",
+            "email": "carey@webtorque.co.nz"
+        }
+    ],
+    "require": {}
+}

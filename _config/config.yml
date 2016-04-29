@@ -1,0 +1,11 @@
+Name: shopstockconfig
+---
+Product:
+  extensions:
+    - ProductStockExtension
+ProductVariation:
+  extensions:
+    - ProductVariationStockExtension
+Product_Controller:
+  extensions:
+    - ProductStockControllerExtension

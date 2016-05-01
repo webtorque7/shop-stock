@@ -1,0 +1,17 @@
+.StoreStockField .store-warehouse {
+    margin-bottom: 10px;
+    width: 300px;
+}
+
+.StoreStockField .warehouse-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.StoreStockField .store-warehouse label{
+    vertical-align: middle;
+}
+
+.StoreStockField .store-warehouse input{
+    float: right;
+}

@@ -22,11 +22,11 @@ class ProductStockControllerExtension extends Extension
         if ($variation) {
             return $this->owner->jsonResponse(array(
                 'Status' => 1,
-                'Stock' => $variation->StockAmount,
+                'Stock' => $variation->checkStock(),
                 'Title' => $variation->Title,
                 'ProductID' => $variation->ProductID,
                 'ID' => $variation->ID,
-                'Price' => $variation->Price
+                'Price' => $variation->sellingPrice()
             ));
         } else {
             return $this->owner->jsonResponse(array(
@@ -38,32 +38,27 @@ class ProductStockControllerExtension extends Extension
 
     public function outofstock()
     {
-        if (!empty($_POST['email'])) {
-            $customerEmail = $_POST['email'];
-            $productID = $_POST['productid'];
-            $ProductVariation = $_POST['variationid'];
+        $data = $this->owner->request->requestVar();
+        $customerEmail = isset($data['email']) ? $data['email'] : null;
+        $productID = isset($data['productid']) ? $data['productid'] : null;
+        $productVariationID = isset($data['variationid']) ? $data['variationid'] : null;
 
-            $notification = new StockNotification();
-            $notification->Email = $customerEmail;
-            if (!empty($ProductVariation) && !empty($productID)) {
-                $product = ProductVariation::get()->filter(array(
-                    'ProductID' => $productID,
-                    'ID' => $ProductVariation
-                ))->first();
-                if (!empty($product)) {
-                    $notification->ProductID = $productID;
-                    $notification->ProductName = $product->Title;
-                    $notification->VariationID = $ProductVariation;
-                }
-            } elseif (!empty($productID)) {
-                $product = Product::get()->filter(array('ID' => $productID))->first();
-                if (!empty($product)) {
-                    $notification->ProductID = $productID;
-                    $notification->ProductName = $product->Title;
-                }
+        if (filter_var($customerEmail, FILTER_VALIDATE_EMAIL) && $productID > 0) {
+            $notification = StockNotification::create();
+
+            $product = Product::get()->byID($productID);
+            if ($productVariationID > 0) {
+                $product = ProductVariation::get()->byID($productVariationID);
+                $notification->IsVariation = true;
+                $notification->VariationID = $productVariationID;
             }
 
-            $notification->write();
+            if ($product && $product->exists()) {
+                $notification->Email = $customerEmail;
+                $notification->ProductID = $productID;
+                $notification->ProductName = $product->Title;
+                $notification->write();
+            }
         }
 
         return $this->owner->redirectBack();
@@ -71,45 +66,48 @@ class ProductStockControllerExtension extends Extension
 
     public function wineoutofstock()
     {
-        if (!empty($_POST['email'])) {
-            $customerEmail = $_POST['email'];
-            $productID = $_POST['productid'];
+        $data = $this->owner->request->requestVar();
+        $customerEmail = isset($data['email']) ? $data['email'] : null;
+        $productID = isset($data['productid']) ? $data['productid'] : null;
 
-            $config = SiteConfig::current_site_config();
-            $messageConfig = MessageConfig::current_message_config();
-            $mailListID = $config->VintageReleaseList;
-            $apikey = $messageConfig->MailChimpAPIKey;
-            $api = new MCAPI($apikey);
+        if (filter_var($customerEmail, FILTER_VALIDATE_EMAIL) && $productID > 0) {
+            $product = WineProduct::get()->byID($productID);
+            if ($product && $product->exists()) {
+                $config = ShopStore::current();
+                $messageConfig = MessageConfig::current_message_config();
+                $mailListID = $config->VintageReleaseList;
+                $apikey = $messageConfig->MailChimpAPIKey;
 
-            if ($api && $response = $api->listSubscribe(
-                    $mailListID,
-                    $customerEmail,
-                    $merge_vars = null,
-                    $email_type = 'html',
-                    MessageConfig::current_message_config()->DoubleOptin,
-                    $update_existing = false,
-                    $replace_interests = true,
-                    MessageConfig::current_message_config()->SendWelcomeMail)
-            ) {
-                $product = WineProduct::get()->byID($productID);
-                $segID = $product->SegmentID;
+                $api = new MCAPI($apikey);
 
-                if (empty($segID)) {
-                    //create signment
+                if ($api && $response = $api->listSubscribe(
+                        $mailListID,
+                        $customerEmail,
+                        $merge_vars = null,
+                        $email_type = 'html',
+                        $messageConfig->DoubleOptin,
+                        $update_existing = false,
+                        $replace_interests = true,
+                        $messageConfig->SendWelcomeMail)
+                ) {
+                    $segID = $product->SegmentID;
+
+                    if (empty($segID)) {
+                        $params = array();
+                        $params["apikey"] = $apikey;
+                        $params["id"] = $mailListID;
+                        $params["name"] = $product->Title;
+                        $segID = $api->callServer("listStaticSegmentAdd", $params);
+                        $product->updateFieldsRaw(array('SegmentID' => $segID));
+                    }
+
                     $params = array();
                     $params["apikey"] = $apikey;
                     $params["id"] = $mailListID;
-                    $params["name"] = $product->Title;
-                    $segID = $api->callServer("listStaticSegmentAdd", $params);
-                    $product->updateFieldsRaw(array('SegmentID' => $segID));
+                    $params["seg_id"] = $segID;
+                    $params["batch"] = array($customerEmail);
+                    $api->callServer("listStaticSegmentMembersAdd ", $params);
                 }
-
-                $params = array();
-                $params["apikey"] = $apikey;
-                $params["id"] = $mailListID;
-                $params["seg_id"] = $segID;
-                $params["batch"] = array($customerEmail);
-                $api->callServer("listStaticSegmentMembersAdd ", $params);
             }
         }
 
@@ -118,17 +116,24 @@ class ProductStockControllerExtension extends Extension
 
     public function notifyNewRelease()
     {
-        if (!empty($_POST['email'])) {
-            $customerEmail = $_POST['email'];
+        $data = $this->owner->request->requestVar();
+        $customerEmail = isset($data['email']) ? $data['email'] : null;
+
+        if (filter_var($customerEmail, FILTER_VALIDATE_EMAIL)) {
             $messageConfig = MessageConfig::current_message_config();
             $mailList = NewsletterList::get()->filter(array('Title' => 'New Release List'));
             $apikey = $messageConfig->MailChimpAPIKey;
             $api = new MCAPI($apikey);
 
-            if ($api && $response = $api->listSubscribe($mailList, $customerEmail, $merge_vars = null,
-                    $email_type = 'html', MessageConfig::current_message_config()->DoubleOptin,
-                    $update_existing = false, $replace_interests = true,
-                    MessageConfig::current_message_config()->SendWelcomeMail)
+            if ($api && $response = $api->listSubscribe(
+                    $mailList,
+                    $customerEmail,
+                    $merge_vars = null,
+                    $email_type = 'html',
+                    $messageConfig->DoubleOptin,
+                    $update_existing = false,
+                    $replace_interests = true,
+                    $messageConfig->SendWelcomeMail)
             ) {
                 $result = array(
                     'status' => 1,

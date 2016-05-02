@@ -44,10 +44,8 @@ class StockNotification extends DataObject
                     $email->setTemplate("StockNotificationEmail");
                     $email->populateTemplate(array(
                         'Product' => $product,
-                        'Content' => array(
-                            'Subject' => $messageConfig->OutOfStockEmailSubject,
-                            'Body' => $messageConfig->dbObject('OutOfStockEmailText')
-                        )
+                        'Subject' => $messageConfig->OutOfStockEmailSubject,
+                        'Body' => $messageConfig->dbObject('OutOfStockEmailText')
                     ));
 
                     $email->send();

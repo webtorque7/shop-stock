@@ -61,7 +61,7 @@ class StoreStockField extends FormField
                 if (is_array($this->value)) {
                     foreach ($this->value as $warehouseID => $stock) {
                         $storeProductStock = StoreProductStock::findOrCreate($warehouseID, $record);
-                        $storeProductStock->StockAmount = StockAmount;
+                        $storeProductStock->StockAmount = $stock;
                         $storeProductStock->write();
                     }
                 }

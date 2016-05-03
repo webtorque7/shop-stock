@@ -85,10 +85,4 @@ class ProductStockExtension extends DataExtension
             $this->owner->write();
         }
     }
-
-    public function onAfterWrite()
-    {
-        parent::onAfterWrite();
-        StockNotification::send_notifications();
-    }
 }

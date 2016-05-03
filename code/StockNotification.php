@@ -24,13 +24,14 @@ class StockNotification extends DataObject
         'Email' => 'Customer Email'
     );
 
-    public function send_notifications()
+    public static function send_notifications()
     {
         $notifications = StockNotification::get();
+        $count = 0;
         foreach ($notifications as $notification) {
-            $product = $this->Product();
+            $product = $notification->Product();
             if($notification->IsVariation){
-                $product = $this->Variation();
+                $product = $notification->Variation();
             }
 
             if ($product && $product->exists()){
@@ -50,15 +51,11 @@ class StockNotification extends DataObject
 
                     $email->send();
                     $notification->delete();
+                    $count ++;
                 }
             }
         }
-    }
-}
 
-class StockNotificationAdmin extends ModelAdmin
-{
-    public static $menu_title = 'Stock Notifications';
-    public static $url_segment = 'stock-notification';
-    public static $managed_models = array('StockNotification');
+        return $count;
+    }
 }

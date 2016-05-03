@@ -76,10 +76,4 @@ class ProductVariationStockExtension extends DataExtension
         $product = $this->owner->Product();
         $this->owner->ShippingUnit = $product->ShippingUnit;
     }
-
-    public function onAfterWrite()
-    {
-        parent::onAfterWrite();
-        StockNotification::send_notifications();
-    }
 }

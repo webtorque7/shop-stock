@@ -18,7 +18,7 @@ class StoreStockField extends FormField
 
     public function Field($properties = array())
     {
-        Requirements::css(STORE_MODULE_DIR . '/css/StoreStockField.css');
+        Requirements::css(STOCK_MODULE_DIR . '/css/StoreStockField.css');
 
         $attributes = array_merge($this->getAttributes(), $properties);
         if ($this->form && $this->form->getRecord()) {

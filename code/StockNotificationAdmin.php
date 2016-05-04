@@ -19,66 +19,109 @@ class StockNotificationAdmin extends ModelAdmin
         $gridFieldName = $this->modelClass;
         $gridField = $form->Fields()->fieldByName($gridFieldName);
 
-        if ($this->modelClass === 'StockNotification') {
-            if ($gridField) {
-                $gridField->getConfig()->getComponentByType('GridFieldDetailForm')->setItemRequestClass(
-                    'SendStockNotification_ItemRequestClass'
-                );
-            }
+        if ($gridField && $this->modelClass === 'StockNotification') {
+            $gridField->getConfig()->addComponent(new SendStockNotificationButton());
         }
 
         return $form;
     }
 }
 
-class SendStockNotification_ItemRequestClass extends GridFieldDetailForm_ItemRequest
-{
-    private static $allowed_actions = array(
-        'ItemEditForm',
-        'sendnotification'
-    );
+//class SendStockNotification_ItemRequestClass extends GridFieldDetailForm_ItemRequest
+//{
+//    private static $allowed_actions = array(
+//        'ItemEditForm',
+//        'sendnotification'
+//    );
+//
+//    public function jsonResponse($array)
+//    {
+//        $response = new SS_HTTPResponse(Convert::raw2json($array));
+//        $response->addHeader('Content-Type', 'application/json');
+//        return $response;
+//    }
+//
+//    public function ItemEditForm()
+//    {
+//        $form = parent::ItemEditForm();
+//        $form->Actions()->push(
+//            FormAction::create('sendnotification', 'Send Notification')
+//                ->setAttribute('data-process-url', '/' . $this->Link('sendnotification'))
+//                ->setUseButtonTag(true)
+//        );
+//
+//        return $form;
+//    }
+//
+//    public function sendnotification()
+//    {
+//        $form = $this->ItemEditForm();
+//        $controller = Controller::curr();
+//        if (!$this->record->canEdit()) {
+//            return $controller->httpError(403);
+//        }
+//
+//        $sentCount = StockNotification::send_notifications();
+//        $message = $sentCount . ' notifications sent.';
+//
+//        if ($this->request->isAjax()) {
+//            $form->sessionMessage($message, 'good');
+//            return $this->jsonResponse(
+//                array(
+//                    'Status' => 1,
+//                    'Message' => $message,
+//                    'Redirect' => $this->Link('edit')
+//                )
+//            );
+//        }
+//
+//        return Controller::curr()->redirect($this->Link());
+//    }
+//}
 
-    public function jsonResponse($array)
-    {
-        $response = new SS_HTTPResponse(Convert::raw2json($array));
-        $response->addHeader('Content-Type', 'application/json');
-        return $response;
+class SendStockNotificationButton implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler {
+
+    protected $targetFragment;
+
+    public function __construct($targetFragment = "before") {
+        $this->targetFragment = $targetFragment;
     }
 
-    public function ItemEditForm()
-    {
-        $form = parent::ItemEditForm();
-        $form->Actions()->push(
-            FormAction::create('sendnotification', 'Send Notification')
-                ->setAttribute('data-process-url', '/' . $this->Link('sendnotification'))
-                ->setUseButtonTag(true)
+    public function getHTMLFragments($gridField) {
+        $button = new GridField_FormAction(
+            $gridField,
+            'stockNotification',
+            'Send Stock Notifications',
+            'stockNotification',
+            null
         );
 
-        return $form;
+        return array(
+            $this->targetFragment => '<p class="grid-stock-notification-button">' . $button->Field() . '</p>',
+        );
     }
 
-    public function sendnotification()
-    {
-        $form = $this->ItemEditForm();
-        $controller = Controller::curr();
-        if (!$this->record->canEdit()) {
-            return $controller->httpError(403);
-        }
+    public function getActions($gridField) {
+        return array('stockNotification');
+    }
 
+    public function handleAction(GridField $gridField, $actionName, $arguments, $data) {
+        if(strtolower($actionName) == 'stocknotification') {
+            $message = $this->sendNotification($gridField);
+
+            Controller::curr()->getResponse()->setStatusCode(200, $message);
+            return Controller::curr()->redirectBack();
+        }
+    }
+
+    public function getURLHandlers($gridField) {
+        return array(
+            'stockNotification' => 'sendNotification',
+        );
+    }
+
+    public function sendNotification($gridField, $request = null) {
         $sentCount = StockNotification::send_notifications();
-        $message = $sentCount . ' notifications sent.';
-
-        if ($this->request->isAjax()) {
-            $form->sessionMessage($message, 'good');
-            return $this->jsonResponse(
-                array(
-                    'Status' => 1,
-                    'Message' => $message,
-                    'Redirect' => $this->Link('edit')
-                )
-            );
-        }
-
-        return Controller::curr()->redirect($this->Link());
+        return $sentCount . ' stock notifications sent.';
     }
 }

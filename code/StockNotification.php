@@ -16,7 +16,8 @@ class StockNotification extends DataObject
 
     private static $has_one = array(
         'Product' => 'Product',
-        'Variation' => 'ProductVariation'
+        'Variation' => 'ProductVariation',
+        'Warehouse' => 'Warehouse'
     );
 
     private static $summary_fields = array(
@@ -34,8 +35,8 @@ class StockNotification extends DataObject
                 $product = $notification->Variation();
             }
 
-            if ($product && $product->exists()){
-                $productStock =  $product->checkStock();
+            if ($product && $product->exists() && $notification->WarehouseID > 0){
+                $productStock = $product->checkStock($notification->Warehouse());
                 if($productStock > 0){
                     $messageConfig = MessageConfig::current_message_config();
                     $email = new Generic_Email();

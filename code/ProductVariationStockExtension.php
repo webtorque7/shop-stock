@@ -35,9 +35,11 @@ class ProductVariationStockExtension extends DataExtension
         }
     }
 
-    public function checkStock()
+    public function checkStock($warehouse = null)
     {
-        $warehouse = $this->owner->findWarehouse();
+        if(!$warehouse){
+            $warehouse = $this->owner->findWarehouse();
+        }
         if ($warehouse && $warehouse->exists()) {
             return StoreProductStock::findOrCreate($warehouse->ID, $this->owner)->StockAmount;
         }

@@ -27,19 +27,15 @@ class StoreStockField extends FormField
             if ($record->hasMethod($this->relationship)) {
 
                 $warehouseData = ArrayList::create();
-                $stores = ShopStore::get();
-                foreach ($stores as $store) {
-                    $warehouse = $store->StoreWarehouse();
-                    if($warehouse && $warehouse->exists()){
+                $warehouses = StoreWarehouse::get();
+                foreach ($warehouses as $warehouse) {
+                    $storeProductStock = StoreProductStock::findOrCreate($warehouse->ID, $record);
 
-                        $storeProductStock = StoreProductStock::findOrCreate($warehouse->ID, $record);
-
-                        $warehouseData->push(ArrayData::create(array(
-                            'WarehouseTitle' => $warehouse->Title,
-                            'WarehouseID' => $warehouse->ID,
-                            'StockAmount' => $storeProductStock->StockAmount
-                        )));
-                    }
+                    $warehouseData->push(ArrayData::create(array(
+                        'WarehouseTitle' => $warehouse->Title,
+                        'WarehouseID' => $warehouse->ID,
+                        'StockAmount' => $storeProductStock->StockAmount
+                    )));
                 }
                 $attributes['Warehouses'] = $warehouseData;
             }

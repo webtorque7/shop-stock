@@ -38,7 +38,7 @@ class ProductStockControllerExtension extends Extension
 
     public function outofstock()
     {
-        $data = $this->owner->request->requestVar();
+        $data = $this->owner->request->requestVars();
         $customerEmail = isset($data['email']) ? $data['email'] : null;
         $productID = isset($data['productid']) ? $data['productid'] : null;
         $productVariationID = isset($data['variationid']) ? $data['variationid'] : null;
@@ -68,7 +68,7 @@ class ProductStockControllerExtension extends Extension
 
     public function wineoutofstock()
     {
-        $data = $this->owner->request->requestVar();
+        $data = $this->owner->request->requestVars();
         $customerEmail = isset($data['email']) ? $data['email'] : null;
         $productID = isset($data['productid']) ? $data['productid'] : null;
 
@@ -118,7 +118,7 @@ class ProductStockControllerExtension extends Extension
 
     public function notifyNewRelease()
     {
-        $data = $this->owner->request->requestVar();
+        $data = $this->owner->request->requestVars();
         $customerEmail = isset($data['email']) ? $data['email'] : null;
 
         if (filter_var($customerEmail, FILTER_VALIDATE_EMAIL)) {

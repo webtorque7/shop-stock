@@ -17,7 +17,7 @@ class StockNotification extends DataObject
     private static $has_one = array(
         'Product' => 'Product',
         'Variation' => 'ProductVariation',
-        'Warehouse' => 'Warehouse'
+        'Warehouse' => 'StoreWarehouse'
     );
 
     private static $summary_fields = array(

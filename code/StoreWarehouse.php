@@ -17,6 +17,10 @@ class StoreWarehouse extends DataObject
         'StoreProductStocks' => 'StoreProductStock'
     );
 
+    private static $summary_fields = array(
+        'Title' => 'Title'
+    );
+
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();

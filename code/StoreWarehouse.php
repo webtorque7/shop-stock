@@ -16,4 +16,12 @@ class StoreWarehouse extends DataObject
         'ShopStores' => 'ShopStore',
         'StoreProductStocks' => 'StoreProductStock'
     );
+
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+        $fields->removeByName('ShopStores', 'StoreProductStocks');
+        $fields->addFieldToTab('Root.Main', TextField::create('Title', 'Warehouse Name'));
+        return $fields;
+    }
 }

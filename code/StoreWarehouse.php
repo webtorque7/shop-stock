@@ -9,7 +9,8 @@
 class StoreWarehouse extends DataObject
 {
     private static $db = array(
-        'Title' => 'Varchar(200)'
+        'Title' => 'Varchar(200)',
+        'Country' => 'Varchar',
     );
 
     private static $has_many = array(
@@ -25,7 +26,13 @@ class StoreWarehouse extends DataObject
     {
         $fields = parent::getCMSFields();
         $fields->removeByName('ShopStores', 'StoreProductStocks');
-        $fields->addFieldToTab('Root.Main', TextField::create('Title', 'Warehouse Name'));
+        $fields->addFieldsToTab('Root.Main', array(
+            TextField::create('Title', 'Warehouse Name'),
+            DropdownField::create('Country', 'Which country is the warehouse in?',
+                array_combine(array_keys(ShopStore::config()->country_locale_mapping),
+                    array_keys(ShopStore::config()->country_locale_mapping)))
+                ->setDescription('This determines where products will be shipped from and whether a member will charged domestic or international shipping')
+        ));
         return $fields;
     }
 }

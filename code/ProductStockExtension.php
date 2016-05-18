@@ -22,21 +22,13 @@ class ProductStockExtension extends DataExtension
             $fields->addFieldToTab('Root.Inventory', new LabelField('VariationStock',
                 'Warehouse Stocks - Because you have one or more variations, the stocks can be set in the "Variations" tab.'));
         } else {
-            $warehouse = $this->owner->findWarehouse();
+            $warehouse = StoreWarehouse::current();
             if ($warehouse && $warehouse->exists()) {
                 $fields->addFieldToTab('Root.Inventory',
                     StoreStockField::create('StoreProductStocks', 'Warehouse Stocks'));
             } else {
                 $fields->addFieldToTab('Root.Inventory', NumericField::create('StockAmount', 'Stock Amount'));
             }
-        }
-    }
-
-    public function findWarehouse()
-    {
-        $store = ShopStore::current();
-        if ($store && $store->StoreWarehouseID) {
-            return $store->StoreWarehouse();
         }
     }
 
@@ -53,7 +45,7 @@ class ProductStockExtension extends DataExtension
         }
 
         if(!$warehouse){
-            $warehouse = $this->owner->findWarehouse();
+            $warehouse = StoreWarehouse::current();
         }
         if ($warehouse && $warehouse->exists()) {
             return StoreProductStock::findOrCreate($warehouse->ID, $this->owner)->StockAmount;
@@ -66,7 +58,7 @@ class ProductStockExtension extends DataExtension
     {
         $stock = $this->owner->checkStock();
 
-        $warehouse = $this->owner->findWarehouse();
+        $warehouse = StoreWarehouse::current();
         if ($warehouse && $warehouse->exists()) {
             $stock = StoreProductStock::findOrCreate($warehouse->ID, $this->owner);
             $stock->updateStock($quantity, $deductible);

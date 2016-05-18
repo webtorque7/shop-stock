@@ -19,7 +19,7 @@ class ProductVariationStockExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
-        $warehouse = $this->owner->findWarehouse();
+        $warehouse = StoreWarehouse::current();
         if ($warehouse && $warehouse->exists()) {
             $fields->addFieldToTab('Root.Inventory', StoreStockField::create('StoreProductStocks', 'Warehouse Stocks'));
         } else {
@@ -27,18 +27,10 @@ class ProductVariationStockExtension extends DataExtension
         }
     }
 
-    public function findWarehouse()
-    {
-        $store = ShopStore::current();
-        if ($store && $store->StoreWarehouseID) {
-            return $store->StoreWarehouse();
-        }
-    }
-
     public function checkStock($warehouse = null)
     {
         if(!$warehouse){
-            $warehouse = $this->owner->findWarehouse();
+            $warehouse = StoreWarehouse::current();
         }
         if ($warehouse && $warehouse->exists()) {
             return StoreProductStock::findOrCreate($warehouse->ID, $this->owner)->StockAmount;
@@ -50,7 +42,7 @@ class ProductVariationStockExtension extends DataExtension
     public function updateStock($quantity, $deductible = false)
     {
         $stock = $this->owner->checkStock();
-        $warehouse = $this->owner->findWarehouse();
+        $warehouse = StoreWarehouse::current();
         if ($warehouse && $warehouse->exists()) {
             $stock = StoreProductStock::findOrCreate($warehouse->ID, $this->owner);
             $stock->updateStock($quantity, $deductible);

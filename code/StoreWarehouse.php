@@ -35,4 +35,12 @@ class StoreWarehouse extends DataObject
         ));
         return $fields;
     }
+
+    public static function current()
+    {
+        $store = ShopStore::current();
+        if ($store && $store->StoreWarehouseID) {
+            return $store->StoreWarehouse();
+        }
+    }
 }

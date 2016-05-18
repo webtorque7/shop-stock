@@ -42,7 +42,7 @@ class ProductStockControllerExtension extends Extension
         $customerEmail = isset($data['email']) ? $data['email'] : null;
         $productID = isset($data['productid']) ? $data['productid'] : null;
         $productVariationID = isset($data['variationid']) ? $data['variationid'] : null;
-        $warehouse = $this->owner->findWarehouse();
+        $warehouse = StoreWarehouse::current();
 
         if (!empty($warehouse) && filter_var($customerEmail, FILTER_VALIDATE_EMAIL) && $productID > 0) {
             $notification = StockNotification::create();

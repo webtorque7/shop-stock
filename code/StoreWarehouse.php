@@ -25,7 +25,7 @@ class StoreWarehouse extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName('ShopStores', 'StoreProductStocks');
+        $fields->removeByName(array('ShopStores', 'StoreProductStocks'));
         $fields->addFieldsToTab('Root.Main', array(
             TextField::create('Title', 'Warehouse Name'),
             DropdownField::create('Country', 'Which country is the warehouse in?',

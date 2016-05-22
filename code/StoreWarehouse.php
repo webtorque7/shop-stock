@@ -36,9 +36,12 @@ class StoreWarehouse extends DataObject
         return $fields;
     }
 
-    public static function current()
+    public static function current($country = null)
     {
         $store = ShopStore::current();
+        if($country){
+            $store = singleton('ShopStore')->StoreForCountry($country);
+        }
         if ($store && $store->StoreWarehouseID) {
             return $store->StoreWarehouse();
         }

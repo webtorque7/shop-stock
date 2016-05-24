@@ -39,10 +39,10 @@ class ProductVariationStockExtension extends DataExtension
         return $this->owner->StockAmount;
     }
 
-    public function updateStock($quantity, $deductible = false)
+    public function updateStock($warehouse, $quantity, $deductible = false)
     {
         $stock = $this->owner->checkStock();
-        $warehouse = StoreWarehouse::current();
+
         if ($warehouse && $warehouse->exists()) {
             $stock = StoreProductStock::findOrCreate($warehouse->ID, $this->owner);
             $stock->updateStock($quantity, $deductible);

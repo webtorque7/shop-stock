@@ -9,3 +9,6 @@ ProductVariation:
 Product_Controller:
   extensions:
     - ProductStockControllerExtension
+Order:
+  extensions:
+    - OrderStockExtension

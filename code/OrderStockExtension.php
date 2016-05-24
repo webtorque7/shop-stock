@@ -18,9 +18,15 @@ class OrderStockExtension extends DataExtension
     {
         parent::onBeforeWrite();
         if(!$this->owner->StoreWarehouseID){
-            $warehousse = StoreWarehouse::current();
-            if($warehousse && $warehousse->exists()){
-                $this->owner->StoreWarehouseID = $warehousse->ID;
+
+            //not working, must get from pre request..
+//            $warehouse = StoreWarehouse::current();
+
+            $storeID = filter_var(ShoppingCart::$cartid_session_name, FILTER_SANITIZE_NUMBER_INT);
+            $warehouse = ShopStore::get()->byID($storeID)->StoreWarehouse();
+
+            if($warehouse && $warehouse->exists()){
+                $this->owner->StoreWarehouseID = $warehouse->ID;
             }
         }
     }

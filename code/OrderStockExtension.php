@@ -6,7 +6,7 @@
  * Date: 24/05/2016
  * Time: 12:27 PM
  */
-class OrderStockExtension extends DataObject
+class OrderStockExtension extends DataExtension
 {
     private static $db = array();
 

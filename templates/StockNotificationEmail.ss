@@ -223,13 +223,13 @@
                                         <tr>
                                             <td width="20%" style="border-top: 2px solid #ae8346; border-bottom: 2px solid #ae8346; padding: 7px 0;">&nbsp;</td>
                                             <td width="20%" style="border-top: 2px solid #ae8346; border-bottom: 2px solid #ae8346; padding: 7px 0;">
-                                                <a style="text-decoration: none;" href="$SiteConfig.EmailFooterShopLink">Shop</a>
+                                                <a style="text-decoration: none;" href="$MessageConfig.EmailFooterShopLink">Shop</a>
                                             </td>
                                             <td width="20%" style="border-top: 2px solid #ae8346; border-bottom: 2px solid #ae8346; padding: 7px 0;">
-                                                <a style="text-decoration: none;" href="$SiteConfig.EmailFooterVisitLink">Visit</a>
+                                                <a style="text-decoration: none;" href="$MessageConfig.EmailFooterVisitLink">Visit</a>
                                             </td>
                                             <td width="20%" style="border-top: 2px solid #ae8346; border-bottom: 2px solid #ae8346; padding: 7px 0;">
-                                                <a style="text-decoration: none;" href="$SiteConfig.EmailFooterJoinLink">Join</a>
+                                                <a style="text-decoration: none;" href="$MessageConfig.EmailFooterJoinLink">Join</a>
                                             </td>
                                             <td width="20%" style="border-top: 2px solid #ae8346; border-bottom: 2px solid #ae8346; padding: 7px 0;">&nbsp;</td>
                                         </tr>
@@ -257,7 +257,7 @@
                                 </td>
                             </tr>
                             <tr height="47" style="font-size: 9px;">
-                                <td style="padding-bottom: 10px;">Gibbston Valley Winery | $SiteConfig.DefaultAddress</td>
+                                <td style="padding-bottom: 10px;">Gibbston Valley Winery | $ShopConfig.DefaultAddress</td>
                             </tr>
                         </table>
                     </td>

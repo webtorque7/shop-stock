@@ -21,9 +21,11 @@ class ProductVariationStockExtension extends DataExtension
     {
         $warehouse = StoreWarehouse::current();
         if ($warehouse && $warehouse->exists()) {
-            $fields->addFieldToTab('Root.Inventory', StoreStockField::create('StoreProductStocks', 'Warehouse Stocks'));
+            $fields->push(StoreStockField::create('StoreProductStocks', 'Warehouse Stocks'));
+//            $fields->addFieldToTab('Root.Inventory', StoreStockField::create('StoreProductStocks', 'Warehouse Stocks'));
         } else {
-            $fields->addFieldToTab('Root.Inventory', NumericField::create('StockAmount', 'Stock Amount'));
+            $fields->push(NumericField::create('StockAmount', 'Stock Amount'));
+//            $fields->addFieldToTab('Root.Inventory', NumericField::create('StockAmount', 'Stock Amount'));
         }
     }
 
